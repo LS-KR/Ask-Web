@@ -29,7 +29,7 @@ jobs:
           export NODE_OPTIONS="--max-old-space-size=4096"
           yarn install
           mkdir src/data
-          echo '{"token":"${{ bot_token }}","chat_id":"${{ chat_id }}"}' > src/data/config.json
+          echo '{"token":"${{ github.event.inputs.bot_token }}","chat_id":"${{ github.event.inputs.chat_id }}"}' > src/data/config.json
           yarn build-only
 
       - name: Publish artifact code
