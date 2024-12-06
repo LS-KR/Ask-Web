@@ -1,0 +1,45 @@
+name: Vite Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      bot_token:
+        description: 'Bot Token'
+        required: true
+      chat_id:
+        description: 'Chat ID or Channel Username'
+        required: true
+
+jobs:
+  build:
+    name: Build main
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Install and build
+        run: |
+          git submodule init
+          git submodule update
+          export NODE_OPTIONS="--max-old-space-size=4096"
+          yarn install
+          mkdir src/data
+          echo '{"token":"${{ bot_token }}","chat_id":"${{ chat_id }}"}' > src/data/config.json
+          yarn build-only
+
+      - name: Publish artifact code
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist
+
+      - name: Deploy to GitHub branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
